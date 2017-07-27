@@ -219,14 +219,20 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
 
+  // x, y
   std::vector<double> result(2*N+2);
   for (i = 0; i < N; i++) {
     result[i]= solution.x[x_start + i];
     result[N+i]= solution.x[y_start + i];
   }
 
-  result[2*N] = solution.x[delta_start];
-  result[2*N+1] = solution.x[a_start];
+  // latency: inspired from Udacity forums
+  int sa_mean = 3;
+  for (int i=0; i < sa_mean; i++){
+    result[2*N] += solution.x[delta_start + i] / sa_mean;
+    result[2*N+1] += solution.x[a_start + i] / sa_mean;
+  }
+
 
   return result;
 }
