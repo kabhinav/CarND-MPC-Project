@@ -4,12 +4,27 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 
 ## The Model
+Simulated vehicle state has following elements:
+
+1. x: position in forward direction
+2. y: position in lateral direction
+3. psi: orientation of vehicle
+4. v: velocity of vehicle
+
+The vehicle also have two actuators: steering angle delta (-25, 25 radians) and acceleration (-1 reverse, 1 forward).Additionally, the constant Lf defines as the distance between car fromt and its center of gravity.
 
 ## Timestep length and Elapsed duration
+The value of timestep length and frequency underwent an iterative tuning process to arrive at final values of 10 and 0.15 respectively. I started with N=25 and duration dt=0.05. However, this selection made the vehicle unstable at sharp turns and on one of the turns the vehicle veered off the road.
+
+Reducing the number of steps with increased length of time steps made the vehicle more stable at speeds around 45 mph. Reduced number of steps also help in improving the solver performance and the system appeared more responsive. I think looking ahead too far on the horizon made solver to predict sharper steering angles.
 
 ## Polynomial Fitting
+First, the waypoints are transformed into vehicle coordinate system. For polynomial fitting I used as third order polynomial of form  "y = a*x^3 + b*x^2 + c*x + d" to fit the truns on the simulated track.
+
+In the initial state vector for solver, x, y and psi are set to 0 since the coordinate system is relative to the vehicle. Intial cte is equal to 3rd order fitted polynomial in this coordinate system and initial orientation is calculated from derivative of the polynomial.
 
 ## Model Predictive control with latency
+To solve the latency issue, I looked in Udacity forum discussions for different ways to handle the latency. Either latency is built into coffecients before giving them to solver OR we can use mean of N states for sterring delta and acceleration values. I chose to take the later approach and calculated delta, acceleration values mean with N=3. Since each time step is 150 ms, choosing 3 as N value results in averaging steering values over 450 ms.
 
 
 ## Dependencies
